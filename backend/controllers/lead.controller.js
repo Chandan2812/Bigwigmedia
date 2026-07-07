@@ -462,7 +462,7 @@ exports.verifyOTP = async (req, res) => {
 
     /* ===== Internal Notification ===== */
     await sendEmail({
-      to: "vipul@bigwigmedia.in",
+      to: "devashish@bigwigmedia.in",
       subject: "New Lead Received - Bigwig Media",
       html: `
   <div style="margin:0;padding:40px 20px;background:#f4f7f9;font-family:Arial,Helvetica,sans-serif;">
