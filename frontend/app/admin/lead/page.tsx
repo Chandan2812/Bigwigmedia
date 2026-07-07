@@ -23,11 +23,7 @@ import { useSettings } from "../../context/SettingsContext";
 import { FaWhatsapp } from "react-icons/fa";
 
 type LeadStatus =
-  | "new"
-  | "contacted"
-  | "follow-up"
-  | "interested"
-  | "not-interested";
+  "new" | "contacted" | "follow-up" | "interested" | "not-interested";
 
 type LeadCategory = "general" | "important";
 
@@ -638,7 +634,7 @@ export default function AdminLead() {
                   {[
                     "Lead",
                     "Contact",
-                    "Address",
+                   
 
                     ...(showAssignment
                       ? ["Status", "Assigned To"]
@@ -699,12 +695,11 @@ export default function AdminLead() {
                             {lead.name}
                           </p>
 
-                          <p className="mt-1 max-w-[260px] truncate text-xs text-[var(--text-secondary)]">
-                            {String(
-                              lead.customFields?.companyName ??
-                                "No company detail",
-                            )}
-                          </p>
+                          {lead.customFields?.companyName && (
+                            <p className="mt-1 max-w-[260px] truncate text-xs text-[var(--text-secondary)]">
+                              {String(lead.customFields.companyName)}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -714,9 +709,7 @@ export default function AdminLead() {
                         {lead.email}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-sm">
-                      <p>{formatFieldValue(lead.customFields?.address)}</p>
-                    </td>
+                   
 
                     {showAssignment && (
                       <>
@@ -1013,24 +1006,30 @@ function LeadModal({
               </p>
             </section>
 
-            <section className="rounded-2xl border border-[var(--border)] p-5">
-              <h3 className="mb-4 font-semibold">Custom Fields</h3>
-              {lead.customFields && Object.keys(lead.customFields).length ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {Object.entries(lead.customFields).map(([key, value]) => (
-                    <Info
-                      key={key}
-                      label={formatCustomFieldLabel(key)}
-                      value={formatFieldValue(value)}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-[var(--text-secondary)]">
-                  No custom fields captured.
-                </p>
+            {lead.customFields &&
+              Object.entries(lead.customFields).filter(
+                ([, value]) =>
+                  value !== "" && value !== null && value !== undefined,
+              ).length > 0 && (
+                <section className="rounded-2xl border border-[var(--border)] p-5">
+                  <h3 className="mb-4 font-semibold">Custom Fields</h3>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {Object.entries(lead.customFields)
+                      .filter(
+                        ([, value]) =>
+                          value !== "" && value !== null && value !== undefined,
+                      )
+                      .map(([key, value]) => (
+                        <Info
+                          key={key}
+                          label={formatCustomFieldLabel(key)}
+                          value={formatFieldValue(value)}
+                        />
+                      ))}
+                  </div>
+                </section>
               )}
-            </section>
 
             {showAssignment && (
               <section className="rounded-2xl border border-[var(--border)] p-5">
