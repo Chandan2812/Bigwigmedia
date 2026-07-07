@@ -191,7 +191,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <Link href="/Clients" className="block">
+                <Link href="/clients" className="block">
                   Clients
                 </Link>
                 <Link href="/strategy" className="block">
