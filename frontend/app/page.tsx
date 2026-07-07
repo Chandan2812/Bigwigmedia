@@ -1,7 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import $ from "jquery";
-import "jquery.ripples";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,9 +11,23 @@ export default function Home() {
   const [showProducts, setShowProducts] = useState(false);
 
   useEffect(() => {
-    if (rippleRef.current) {
+    let isMounted = true;
+    let jquery: typeof import("jquery").default | null = null;
+    const rippleElement = rippleRef.current;
+
+    async function initRipples() {
+      if (!rippleElement) return;
+
       try {
-        ($(rippleRef.current) as any).ripples({
+        const jqueryModule = await import("jquery");
+        await import("jquery.ripples");
+
+        if (!isMounted) return;
+
+        const $ = jqueryModule.default;
+        jquery = $;
+
+        $(rippleElement).ripples({
           resolution: 256,
           perturbance: 0.01,
         });
@@ -23,6 +35,19 @@ export default function Home() {
         console.error("Ripple effect failed to initialize:", e);
       }
     }
+
+    initRipples();
+
+    return () => {
+      isMounted = false;
+      try {
+        if (rippleElement && jquery) {
+          jquery(rippleElement).ripples("destroy");
+        }
+      } catch {
+        // The plugin may not have finished loading before unmount.
+      }
+    };
   }, []);
 
   return (
@@ -410,7 +435,7 @@ export default function Home() {
             href="/contact"
             className="w-1/2 py-3 bg-black text-white text-center"
           >
-            I'm Interested
+            I&apos;m Interested
           </Link>
         </div>
       </div>
@@ -426,14 +451,13 @@ type HoverTextProps = {
 
 function HoverText({ defaultText, hoverText, boldText }: HoverTextProps) {
   const highlightBold = (text: string) => {
-    // This function will split the hoverText and make the bold part bold
     return text.split(boldText).map((part, index) => {
-      if (index === 0) return <span>{part}</span>;
+      if (index === 0) return <span key={index}>{part}</span>;
       return (
-        <>
+        <span key={index}>
           <span style={{ fontWeight: 400 }}>{boldText}</span>
           <span>{part}</span>
-        </>
+        </span>
       );
     });
   };
