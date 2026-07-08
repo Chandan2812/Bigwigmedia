@@ -216,6 +216,7 @@ export default function Home() {
             alt="bulb"
             width={400}
             height={200}
+            loading="eager"
             className="absolute top-0 right-0 w-1/3 h-48 z-0 -mt-6"
           />
 
