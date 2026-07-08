@@ -17,7 +17,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         {/* Google Analytics */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-PRP845JDWV"
+          src="https://www.googletagmanager.com/gtag/js?id=G-52K8HFX91N"
           strategy="afterInteractive"
         />
 
@@ -29,7 +29,7 @@ export default function RootLayout({
 
             gtag('js', new Date());
 
-            gtag('config', 'G-PRP845JDWV');
+            gtag('config', 'G-52K8HFX91N');
           `}
         </Script>
 
