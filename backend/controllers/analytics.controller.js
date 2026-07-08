@@ -9,6 +9,10 @@ const getBrowsers = require("../lib/analyticsBrowsers");
 const getNewVsReturning = require("../lib/analyticsNewVsReturning");
 const getRealtime = require("../lib/analyticsRealtime");
 const {
+  getSearchConsoleReport,
+  getSites,
+} = require("../lib/searchConsole");
+const {
   getDateRange,
   getMongoDateRange,
 } = require("../lib/analyticsDateRange");
@@ -383,6 +387,44 @@ exports.conversions = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch conversion analytics",
+    });
+  }
+};
+
+exports.searchConsole = async (req, res) => {
+  try {
+    const dateRange = getDateRange(req.query);
+    const report = await getSearchConsoleReport(dateRange);
+
+    res.json(report);
+  } catch (err) {
+    console.error("Search Console Error:", err.response?.data || err);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch Search Console data",
+      detail: err.response?.data?.error?.message || err.message,
+    });
+  }
+};
+
+exports.searchConsoleSites = async (req, res) => {
+  try {
+    const sites = await getSites();
+
+    res.json(
+      sites.map((site) => ({
+        siteUrl: site.siteUrl,
+        permissionLevel: site.permissionLevel,
+      })),
+    );
+  } catch (err) {
+    console.error("Search Console Sites Error:", err.response?.data || err);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch Search Console sites",
+      detail: err.response?.data?.error?.message || err.message,
     });
   }
 };

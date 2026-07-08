@@ -14,5 +14,7 @@ router.get("/browsers", analyticsController.browserBreakdown);
 router.get("/new-vs-returning", analyticsController.newVsReturning);
 router.get("/realtime", analyticsController.realtime);
 router.get("/conversions", analyticsController.conversions);
+router.get("/search-console", analyticsController.searchConsole);
+router.get("/search-console/sites", analyticsController.searchConsoleSites);
 
 module.exports = router;
