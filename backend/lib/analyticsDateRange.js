@@ -1,8 +1,28 @@
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const RANGE_DAYS = {
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+};
+
+const toDateString = (date) => date.toISOString().slice(0, 10);
+
+const getDaysAgoRange = (days) => {
+  const end = new Date();
+  const start = new Date();
+
+  start.setDate(end.getDate() - days);
+
+  return {
+    startDate: toDateString(start),
+    endDate: toDateString(end),
+  };
+};
 
 const getDateRange = (query = {}) => {
   const startDate = String(query.startDate || "").trim();
   const endDate = String(query.endDate || "").trim();
+  const range = String(query.range || "").trim().toLowerCase();
 
   if (DATE_PATTERN.test(startDate) && DATE_PATTERN.test(endDate)) {
     return {
@@ -11,10 +31,7 @@ const getDateRange = (query = {}) => {
     };
   }
 
-  return {
-    startDate: "30daysAgo",
-    endDate: "today",
-  };
+  return getDaysAgoRange(RANGE_DAYS[range] || RANGE_DAYS["30d"]);
 };
 
 const getMongoDateRange = (dateRange) => {
