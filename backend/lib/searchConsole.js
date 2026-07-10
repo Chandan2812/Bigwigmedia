@@ -90,9 +90,33 @@ const formatRow = (row, keyName) => ({
   position: Number(row.position || 0),
 });
 
+const formatQueryPageRow = (row) => ({
+  query: row.keys?.[0] || "Unknown",
+  page: row.keys?.[1] || "Unknown",
+  clicks: Number(row.clicks || 0),
+  impressions: Number(row.impressions || 0),
+  ctr: Number(row.ctr || 0),
+  position: Number(row.position || 0),
+});
+
+const formatTrendRow = (row) => ({
+  date: row.keys?.[0] || "",
+  clicks: Number(row.clicks || 0),
+  impressions: Number(row.impressions || 0),
+  ctr: Number(row.ctr || 0),
+  position: Number(row.position || 0),
+});
+
 const getSearchConsoleReport = async (dateRange) => {
   const siteUrl = getConfiguredSiteUrl();
-  const [overviewRows, queryRows, pageRows] = await Promise.all([
+  const [
+    overviewRows,
+    queryRows,
+    opportunityRows,
+    pageRows,
+    trendRows,
+    queryPageRows,
+  ] = await Promise.all([
     querySearchAnalytics({
       siteUrl,
       ...dateRange,
@@ -107,12 +131,38 @@ const getSearchConsoleReport = async (dateRange) => {
     querySearchAnalytics({
       siteUrl,
       ...dateRange,
+      dimensions: ["query"],
+      rowLimit: 50,
+    }),
+    querySearchAnalytics({
+      siteUrl,
+      ...dateRange,
       dimensions: ["page"],
       rowLimit: 10,
+    }),
+    querySearchAnalytics({
+      siteUrl,
+      ...dateRange,
+      dimensions: ["date"],
+      rowLimit: 25000,
+    }),
+    querySearchAnalytics({
+      siteUrl,
+      ...dateRange,
+      dimensions: ["query", "page"],
+      rowLimit: 20,
     }),
   ]);
 
   const overview = overviewRows[0] || {};
+  const lowCtrOpportunities = opportunityRows
+    .filter(
+      (row) =>
+        Number(row.impressions || 0) >= 50 && Number(row.ctr || 0) < 0.02,
+    )
+    .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+    .slice(0, 10)
+    .map((row) => formatRow(row, "query"));
 
   return {
     siteUrl,
@@ -122,6 +172,12 @@ const getSearchConsoleReport = async (dateRange) => {
     position: Number(overview.position || 0),
     queries: queryRows.map((row) => formatRow(row, "query")),
     pages: pageRows.map((row) => formatRow(row, "page")),
+    trend: trendRows
+      .map(formatTrendRow)
+      .filter((row) => row.date)
+      .sort((a, b) => a.date.localeCompare(b.date)),
+    lowCtrOpportunities,
+    queryPages: queryPageRows.map(formatQueryPageRow),
   };
 };
 
